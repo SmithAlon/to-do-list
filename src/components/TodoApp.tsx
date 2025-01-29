@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import TodoList from './TodoList';
 
 export interface TodoI {
@@ -13,6 +13,7 @@ interface TodoAppProps {
 export default function TodoApp({ isDarkMode }: TodoAppProps) {
     const [todo, setTodo] = useState<TodoI>({ title: '', id: 0 });
     const [todos, setTodos] = useState<TodoI[]>([]);
+    const [editingTodo, setEditingTodo] = useState<TodoI | null>(null);
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTodo({ title: e.target.value, id: todo.id });
@@ -30,6 +31,15 @@ export default function TodoApp({ isDarkMode }: TodoAppProps) {
         setTodos(nonDeletedTodos);
     };
 
+    const startEditing = (todo: TodoI) => {
+        setEditingTodo(todo);
+    };
+
+    const saveTodo = (updatedTodo: TodoI) => {
+        setTodos(todos.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo)));
+        setEditingTodo(null);
+    };
+
     return (
         <div className={`d-flex align-items-center mt-5 flex-column ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
             <div className="flex-column shadow-sm d-flex justify-content-between" style={{ width: '500px' }}>
@@ -45,7 +55,7 @@ export default function TodoApp({ isDarkMode }: TodoAppProps) {
                         <button onClick={onEnter} className="btn btn-primary">Enter</button>
                     )}
                 </div>
-                <TodoList todos={todos} deleteTodo={deleteTodo} isDarkMode={isDarkMode} />
+                <TodoList todos={todos} deleteTodo={deleteTodo} startEditing={startEditing} saveTodo={saveTodo} editingTodo={editingTodo} isDarkMode={isDarkMode} />
             </div>
         </div>
     );
